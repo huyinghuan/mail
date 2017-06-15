@@ -8,7 +8,7 @@ func TestSender(t *testing.T) {
 		Username: "xxxxx@163.com",
 		Password: "xx",
 		Host:     "smtp.163.com",
-		Port:     "465"}
+		Port:     456}
 	/*
 		sender := &MailSender{
 			Username: "xxxxx@qq.com",

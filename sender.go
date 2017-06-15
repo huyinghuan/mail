@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/mail"
 	"net/smtp"
+	"strconv"
 	"strings"
 )
 
@@ -13,7 +14,7 @@ type MailSender struct {
 	Username string
 	Password string
 	Host     string
-	Port     string
+	Port     int
 }
 
 //SendMail 发送邮件
@@ -44,7 +45,7 @@ func (sender *MailSender) SendMail(subject string, content string, contact []str
 		InsecureSkipVerify: true,
 		ServerName:         sender.Host}
 
-	conn, err := tls.Dial("tcp", sender.Host+":"+sender.Port, tlsconfig)
+	conn, err := tls.Dial("tcp", sender.Host+":"+strconv.Itoa(sender.Port), tlsconfig)
 	if err != nil {
 		return err
 	}
