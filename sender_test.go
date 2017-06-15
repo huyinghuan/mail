@@ -14,7 +14,7 @@ func TestSender(t *testing.T) {
 			Username: "xxxxx@qq.com",
 			Password: "xx",
 			Host:     "smtp.qq.com",
-			Port:     "465"}
+			Port:     465}
 	*/
 	if err := sender.SendMail("GOMAIL Test", "hello world!", []string{"ec.huyinghuan@gmail.com"}); err != nil {
 		log.Fatal(err)
