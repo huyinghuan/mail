@@ -28,11 +28,31 @@ type MailSender struct {
 	Port     int
 }
 
+type MailContent struct{
+	Subject string
+	Content string
+	Contact []string
+	ContentType string
+	Other map[string]string
+}
+
+func (sender *MailSender) Send(mailConent *MailContent) error{
+	if mailConent.Other == nil{
+		mailConent.Other = map[string]string{}
+	}
+	if mailConent.ContentType == ""{
+		mailConent.ContentType = "text/plain; charset=\"utf-8\""
+	}
+	mailConent.Other["Content-Type"] = mailConent.ContentType
+	return sender.SendMail(mailConent.Subject, mailConent.Content, mailConent.Contact, mailConent.Other)
+
+}
+
 //SendMail 发送邮件
 //subject 邮件标题
 //content 邮件内容
 //contact 联系人
-func (sender *MailSender) SendMail(subject string, content string, contact []string) error {
+func (sender *MailSender) SendMail(subject string, content string, contact []string, args ...map[string]string) error {
 	if len(contact) == 0 {
 		return fmt.Errorf("联系人不能为空. Contact cannot be empty!\n")
 	}
@@ -44,6 +64,12 @@ func (sender *MailSender) SendMail(subject string, content string, contact []str
 	headers["From"] = from.String()
 	headers["To"] = strings.Join(contact, ";")
 	headers["Subject"] = subject
+	if args != nil{
+		arg := args[0]
+		for key, value := range arg{
+			headers[key]=value
+		}
+	}
 	// Build Email Content
 	message := ""
 	for k, v := range headers {
