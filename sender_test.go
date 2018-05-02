@@ -5,18 +5,19 @@ import "log"
 
 func TestSender(t *testing.T) {
 	sender := &MailSender{
-		Username: "xxxxx@163.com",
-		Password: "xx",
+		NoSSL: true,
+		Username: "xiacijian@163.com",
+		Password: "xxx",
 		Host:     "smtp.163.com",
-		Port:     456}
-	/*
-		sender := &MailSender{
-			Username: "xxxxx@qq.com",
-			Password: "xx",
-			Host:     "smtp.qq.com",
-			Port:     465}
-	*/
-	if err := sender.SendMail("GOMAIL Test", "hello world!", []string{"ec.huyinghuan@gmail.com"}); err != nil {
+		Port:     465}
+
+		//sender := &MailSender{
+		//	Username: "646344359@qq.com",
+		//	Password: "",
+		//	Host:     "smtp.qq.com",
+		//	Port:     465}
+
+	if err := sender.SendMail("GOMAIL Test", "hello world!", []string{"ec.huyinghuan@gmail.com", "646344359@qq.com"}); err != nil {
 		log.Fatal(err)
 		t.Fail()
 	} else {

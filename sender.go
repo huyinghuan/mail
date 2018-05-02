@@ -8,9 +8,20 @@ import (
 	"strconv"
 	"strings"
 )
+type fakeAuth struct {
+	smtp.Auth
+}
+
+func (a fakeAuth) Start(server *smtp.ServerInfo) (string, []byte,
+	error) {
+	server.TLS = true
+	return a.Auth.Start(server)
+}
+
 
 //MailSender 邮件发送人
 type MailSender struct {
+	NoSSL bool
 	Username string
 	Password string
 	Host     string
@@ -26,12 +37,12 @@ func (sender *MailSender) SendMail(subject string, content string, contact []str
 		return fmt.Errorf("联系人不能为空. Contact cannot be empty!\n")
 	}
 	from := mail.Address{"", sender.Username}
-	to := mail.Address{"", strings.Join(contact, ";")}
+	//to := mail.Address{"", strings.Join(contact, ";")}
 
 	// Setup headers
 	headers := make(map[string]string)
 	headers["From"] = from.String()
-	headers["To"] = to.String()
+	headers["To"] = strings.Join(contact, ";")
 	headers["Subject"] = subject
 	// Build Email Content
 	message := ""
@@ -39,8 +50,11 @@ func (sender *MailSender) SendMail(subject string, content string, contact []str
 		message += fmt.Sprintf("%s: %s\r\n", k, v)
 	}
 	message += "\r\n" + content
-
 	auth := smtp.PlainAuth("", sender.Username, sender.Password, sender.Host)
+	if sender.NoSSL{
+		auth = fakeAuth{auth}
+	}
+
 	tlsconfig := &tls.Config{
 		InsecureSkipVerify: true,
 		ServerName:         sender.Host}
@@ -49,12 +63,10 @@ func (sender *MailSender) SendMail(subject string, content string, contact []str
 	if err != nil {
 		return err
 	}
-
 	c, err := smtp.NewClient(conn, sender.Host)
 	if err != nil {
 		return err
 	}
-
 	// Auth
 	if err = c.Auth(auth); err != nil {
 		return err
@@ -62,8 +74,10 @@ func (sender *MailSender) SendMail(subject string, content string, contact []str
 	if err = c.Mail(from.Address); err != nil {
 		return err
 	}
-	if err = c.Rcpt(to.Address); err != nil {
-		return err
+	for _, addr := range contact {
+		if err = c.Rcpt(addr); err != nil {
+			return err
+		}
 	}
 	// Data
 	w, err := c.Data()

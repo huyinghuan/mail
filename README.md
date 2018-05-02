@@ -29,6 +29,8 @@ func TestSender(t *testing.T) {
 		log.Println("发送成功！")
 	}
 }
+
+如果抛出 unencrypted connection 错误，请设置  `sender.NoSSL = true`
 ```
 
 ## LICENSE
