@@ -1,5 +1,7 @@
 ## 邮件发送服务
 
+不建议使用此库，推荐:https://github.com/go-gomail/gomail
+
 适用于国内的 163， qq邮箱
 
 不支持附件
